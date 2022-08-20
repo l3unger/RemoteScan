@@ -1,0 +1,71 @@
+- name: Commands
+  config:
+    commands:
+        - name: x                              # 命令的名字
+          short_name: x                        # 命令的缩写
+          usage: Infinitely possible commands  # 简要介绍
+          description: ""                      # 详细介绍
+          plugins:                             # 该命令由哪些插件组成
+            - '*'
+- name: PluginLoader
+  config:
+    path: ./plugin                             # 存放插件的路径
+- name: Pool
+  config:
+    size: 100                                  # go routine 池的大小，即事件处理并发度
+- name: Reverse
+  config:
+    db_file_path: ""                           # 反连平台数据库文件位置, 这是一个 KV 数据库
+    token: ""                                  # 反连平台认证的 Token, 独立部署时不能为空
+    http:
+        enabled: false
+        listen_ip: 0.0.0.0
+        listen_port: ""
+        ip_header: ""                          # 在哪个 http header 中取 ip，为空代表从 REMOTE_ADDR 中取
+    dns:
+        enabled: false
+        listen_ip: 0.0.0.0
+        domain: ""                             # DNS 域名配置
+        is_domain_name_server: false           # 是否修改了域名的 ns 为反连平台，如果是，那 nslookup 等就不需要指定 dns 了
+        resolve:                               # DNS 静态解析规则
+            - type: A                          # A, AAAA, TXT 三种
+              record: localhost
+              value: 127.0.0.1
+              ttl: 60
+    rmi:
+        enabled: false
+        listen_ip: 127.0.0.1
+        listen_port: ""
+    client:
+        remote_server: false                   # 是否是独立的远程 server，如果是要在下面配置好远程的服务端地址
+        http_base_url: ""                      # 默认将根据 ListenIP 和 ListenPort 生成，该地址是存在漏洞的目标反连回来的地址, 当反连平台前面有反代、绑定域名、端口映射时需要自行配置
+        dns_server_ip: ""                      # 和 http_base_url 类似，实际用来访问 dns 服务器的地址
+        rmi_server_addr: ""                    # 和 http_base_url 类似，实际用来访问 rmi 服务的地址
+- name: Client
+  config:
+    proxy: ""                                  # 漏洞扫描时使用的代理，如: http://127.0.0.1:8080。 如需设置多个代理，请使用 proxy_rule 或自行创建上层代理
+    proxy_rule: []                             # 漏洞扫描使用多个代理的配置规则, 具体请参照文档
+    dial_timeout: 5                            # 建立 tcp 连接的超时时间
+    read_timeout: 10                           # 读取 http 响应的超时时间，不可太小，否则会影响到 sql 时间盲注的判断
+    max_conns_per_host: 50                     # 同一 host 最大允许的连接数，可以根据目标主机性能适当增大
+    enable_http2: false                        # 是否启用 http2, 开启可以提升部分网站的速度，但目前不稳定有崩溃的风险
+    pkcs12:
+        path: ""
+        password: ""
+    fail_retries: 0                            # 请求失败的重试次数，0 则不重试
+    max_redirect: 5                            # 单个请求最大允许的跳转数
+    max_resp_body_size: 2097152                # 最大允许的响应大小, 默认 2M
+    max_qps: 500                               # 每秒最大请求数
+    allow_methods:                             # 允许的请求方法
+        - HEAD
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+        - CONNECT
+        - TRACE
+        - MOVE
+        - PROPFIND
+    headers: {}
