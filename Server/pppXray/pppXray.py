@@ -68,7 +68,6 @@ def communityMergeReport(tempTypeResult,bugTypeSet):
     return
 
 
-
 def assortReport():
     '''
     对 save 文件夹下的漏洞文件进行分类
